@@ -1,18 +1,41 @@
-<!DOCTYPE html>
-<html>
+async function main() {
 
-<head>
-    <title>Admin Portal</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
-</head>
+    let response = await fetch('http://localhost:3001/listBooks')
 
-<body>
-   <div id="root">
-       
-   </div>
-    <!-- Our JavaScript Code  -->
-    <script src="admin.js"></script>
-</body>
+    let books = await response.json()
 
-</html>
+    books.forEach(renderBook)
+}
+
+function renderBook(book) {
+    let root = document.getElementById('root')
+
+    let li = document.createElement('li')
+    li.textContent = book.title
+
+    let quantityInput = document.createElement('input')
+    quantityInput.value = book.quantity
+
+    let saveButton = document.createElement('button')
+    saveButton.textContent = 'Save'
+
+    saveButton.addEventListener('click', () => {
+        fetch('http://localhost:3001/updateBook', {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                id: book.id,
+                quantity: quantityInput.value
+            })
+        })
+    })
+
+    li.append(quantityInput, saveButton)
+
+    root.append(li)
+}
+
+main();
+// Your Code Here
